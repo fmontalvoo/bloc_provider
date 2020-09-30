@@ -53,9 +53,7 @@ class _MultiBlocProvider<T extends Bloc> extends InheritedWidget {
   }
 
   Bloc getBloc<T extends Bloc>() {
-    for (int i = 0; i < blocs.length; i++)
-      if (blocs[i].runtimeType == T) return blocs[i];
-    throw FlutterError('Unable to find BLoC of type $T.');
+    return blocs.singleWhere((type) => (type is T), orElse: null);
   }
 
   @override
