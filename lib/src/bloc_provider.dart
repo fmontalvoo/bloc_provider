@@ -42,14 +42,13 @@ class _BlocProvider<T extends Bloc> extends InheritedWidget {
   final T bloc;
   final Widget child;
 
-  _BlocProvider({Key key, @required this.bloc, @required this.child})
-      : super(key: key);
+  _BlocProvider({@required this.bloc, @required this.child})
+      : super(child: child);
 
   static T of<T extends Bloc>(BuildContext context) {
-    final bloc =
-        context.dependOnInheritedWidgetOfExactType<_BlocProvider<T>>().bloc;
+    final bloc = context.dependOnInheritedWidgetOfExactType<_BlocProvider<T>>();
     if (bloc == null) throw FlutterError('Unable to find BLoC of type $T.');
-    return bloc;
+    return bloc.bloc;
   }
 
   @override

@@ -4,8 +4,8 @@ import 'package:bloc_provider/bloc_provider.dart';
 
 // STATEFULWIDGET
 
-class MultiBlocProvider<T extends Bloc> extends StatefulWidget {
-  final List<T> blocs;
+class MultiBlocProvider extends StatefulWidget {
+  final List<Bloc> blocs;
   final Widget child;
 
   MultiBlocProvider({Key key, @required this.blocs, @required this.child})
@@ -15,13 +15,12 @@ class MultiBlocProvider<T extends Bloc> extends StatefulWidget {
       _MultiBlocProvider.of(context);
 
   @override
-  State<StatefulWidget> createState() => _MultiBlocProviderState<T>();
+  State<StatefulWidget> createState() => _MultiBlocProviderState<Bloc>();
 }
 
 // STATE
 
-class _MultiBlocProviderState<T extends Bloc>
-    extends State<MultiBlocProvider<T>> {
+class _MultiBlocProviderState<T extends Bloc> extends State<MultiBlocProvider> {
   @override
   Widget build(BuildContext context) {
     return _MultiBlocProvider(
@@ -43,23 +42,23 @@ class _MultiBlocProvider<T extends Bloc> extends InheritedWidget {
   final List<T> blocs;
   final Widget child;
 
-  _MultiBlocProvider({Key key, @required this.blocs, @required this.child})
-      : super(key: key);
+  _MultiBlocProvider({@required this.blocs, @required this.child})
+      : super(child: child);
 
   static T of<T extends Bloc>(BuildContext context) {
-    return context
+    final bloc = context
         .dependOnInheritedWidgetOfExactType<_MultiBlocProvider<Bloc>>()
-        .getBloc<T>();
+        ._getBloc<T>();
+    if (bloc == null) throw FlutterError('Unable to find BLoC of type $T');
+    return bloc;
   }
 
-  Bloc getBloc<T extends Bloc>() {
-    final bloc = blocs.singleWhere((type) => (type is T), orElse: null);
-    if (bloc == null) throw FlutterError('Unable to find BLoC of type $T.');
-    return bloc;
+  Bloc _getBloc<T extends Bloc>() {
+    return this.blocs.singleWhere((type) => (type is T), orElse: () => null);
   }
 
   @override
   bool updateShouldNotify(_MultiBlocProvider oldWidget) {
-    return blocs != oldWidget.blocs;
+    return this.blocs != oldWidget.blocs;
   }
 }
