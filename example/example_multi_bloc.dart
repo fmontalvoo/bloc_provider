@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(),
       body: Container(
           child: StreamBuilder(
-        stream: blocB.getDataB,
+        stream: blocA.getDataA ?? blocB.getDataB ?? blocC.getDataC,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Center(child: Text(snapshot.data));

@@ -5,11 +5,14 @@ import 'package:bloc_provider/bloc_provider.dart';
 // STATEFULWIDGET
 
 class MultiBlocProvider extends StatefulWidget {
+  const MultiBlocProvider({
+    Key? key,
+    required this.blocs,
+    required this.child,
+  }) : super(key: key);
+
   final List<Bloc> blocs;
   final Widget child;
-
-  MultiBlocProvider({Key key, @required this.blocs, @required this.child})
-      : super(key: key);
 
   static T of<T extends Bloc>(BuildContext context) =>
       _MultiBlocProvider.of(context);
@@ -25,13 +28,15 @@ class _MultiBlocProviderState<T extends Bloc> extends State<MultiBlocProvider> {
   Widget build(BuildContext context) {
     return _MultiBlocProvider(
       blocs: widget.blocs,
-      child: widget.child,
+      newChild: widget.child,
     );
   }
 
   @override
   void dispose() {
-    widget.blocs.forEach((bloc) => bloc.dispose());
+    for (final bloc in widget.blocs) {
+      bloc.dispose();
+    }
     super.dispose();
   }
 }
@@ -39,26 +44,30 @@ class _MultiBlocProviderState<T extends Bloc> extends State<MultiBlocProvider> {
 // INHERITEDWIDGET
 
 class _MultiBlocProvider<T extends Bloc> extends InheritedWidget {
-  final List<T> blocs;
-  final Widget child;
+  const _MultiBlocProvider({
+    required this.blocs,
+    required this.newChild,
+  }) : super(child: newChild);
 
-  _MultiBlocProvider({@required this.blocs, @required this.child})
-      : super(child: child);
+  final List<T> blocs;
+  final Widget newChild;
 
   static T of<T extends Bloc>(BuildContext context) {
     final bloc = context
-        .dependOnInheritedWidgetOfExactType<_MultiBlocProvider<Bloc>>()
+        .dependOnInheritedWidgetOfExactType<_MultiBlocProvider<Bloc>>()!
         ._getBloc<T>();
     if (bloc == null) throw FlutterError('Unable to find BLoC of type $T');
-    return bloc;
+    return bloc as T;
   }
 
-  Bloc _getBloc<T extends Bloc>() {
-    return this.blocs.singleWhere((type) => (type is T), orElse: () => null);
+  // ignore: avoid_shadowing_type_parameters
+  Bloc? _getBloc<T extends Bloc>() {
+    //ignore: return_of_invalid_type_from_closure
+    return blocs.singleWhere((type) => (type is T), orElse: () => null);
   }
 
   @override
   bool updateShouldNotify(_MultiBlocProvider oldWidget) {
-    return this.blocs != oldWidget.blocs;
+    return blocs != oldWidget.blocs;
   }
 }

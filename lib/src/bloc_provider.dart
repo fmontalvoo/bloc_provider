@@ -8,8 +8,11 @@ class BlocProvider<T extends Bloc> extends StatefulWidget {
   final T bloc;
   final Widget child;
 
-  BlocProvider({Key key, @required this.bloc, @required this.child})
-      : super(key: key);
+  const BlocProvider({
+    Key? key,
+    required this.bloc,
+    required this.child,
+  }) : super(key: key);
 
   static T of<T extends Bloc>(BuildContext context) =>
       _BlocProvider.of(context);
@@ -25,7 +28,7 @@ class _BlocProviderState<T extends Bloc> extends State<BlocProvider<T>> {
   Widget build(BuildContext context) {
     return _BlocProvider(
       bloc: widget.bloc,
-      child: widget.child,
+      newChild: widget.child,
     );
   }
 
@@ -39,11 +42,11 @@ class _BlocProviderState<T extends Bloc> extends State<BlocProvider<T>> {
 // INHERITEDWIDGET
 
 class _BlocProvider<T extends Bloc> extends InheritedWidget {
-  final T bloc;
-  final Widget child;
+  const _BlocProvider({required this.bloc, required this.newChild})
+      : super(child: newChild);
 
-  _BlocProvider({@required this.bloc, @required this.child})
-      : super(child: child);
+  final T bloc;
+  final Widget newChild;
 
   static T of<T extends Bloc>(BuildContext context) {
     final bloc = context.dependOnInheritedWidgetOfExactType<_BlocProvider<T>>();
